@@ -2,6 +2,7 @@
 	- 3 bytes - 1 byte de uso? - 1 byte de vida - 1 byte de daño
 - Array de Torres:
 	- 3 bytes - 1 byte de uso? - 1 byte de vida - 1 byte de daño
+- Array de Proyectiles.
 
 - Camino (ver foto):
 	- Camino Sencillo: solo una fila
