@@ -1,0 +1,25 @@
+- Array de Enemigos:
+	- 3 bytes - 1 byte de uso? - 1 byte de vida - 1 byte de daño
+- Array de Torres:
+	- 3 bytes - 1 byte de uso? - 1 byte de vida - 1 byte de daño
+
+- Camino (ver foto):
+	- Camino Sencillo: solo una fila
+	- Camino completo: todas las filas
+- Movimiento enemigos por el camino
+- Sistema colisiones:
+	- Daño de enemigos
+	- Daño de plantas (reutilizable?)
+- Gamepad:
+	- Uso de sprites
+	- Colocacion de torres
+	- Seleccion de menu
+- Definir Estructura de cuadros (los dibujos) de 2x2 tiles.
+- Funcion rellenar cuadro de tiles (2x2):
+	- Funcion que se encarga de dibujar cuadro predefinidos en los cuadros de 2x2 tiles:
+		- Cuadro de torres
+		- Cuadro de enemigos
+		- Cuadro de camino
+		- etc
+
+ 
