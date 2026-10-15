@@ -15,9 +15,22 @@
 ;; ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         ;;
 ;;-------------------------------------------------------------------------------------------------------------------------------;;
 
+DEF TAM_ARRAY_POLLOS = 120
+DEF TAM_ARRAY_STRONG = 120
+
+SECTION "Data", WRAM0
+
+;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
+Array_pollos: ds 160
+
+;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
+Array_strong: ds 160
+
 SECTION "Entry point", ROM0[$150]
 
 main::
+
+   
 
    call init ;; Inicialización del programa
    
