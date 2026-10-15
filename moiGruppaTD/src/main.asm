@@ -21,7 +21,7 @@ DEF TAM_ARRAY_STRONG = 120
 SECTION "Data", WRAM0
 
 ;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
-Array_pollos: ds 160
+Array_chickens:: ds 160
 
 ;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
 Array_strong: ds 160
