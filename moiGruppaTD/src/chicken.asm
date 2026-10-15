@@ -12,10 +12,10 @@ DEF PRESET_SIZE = 2  ; Bytes por cada tipo en la tabla
 
 SECTION "Chickens", ROM0
 ; Tabla con los datos estáticos: [Vida, Daño]
-ChickenPresetsTable:
-    db 10, 1  
-    db 5,  2  
-    db 30, 5 
+chickenPresetsTable:
+    db 10, 1  ;tipo a
+    db 5,  2  ;tipo b
+    db 30, 5  ;tipo c
 
 initChickenArray::
     ld hl, Array_chickens  ;; Posicion inicial del array
@@ -36,4 +36,59 @@ initChickenArray::
 
 	    dec a 
 	    jp nz, .loop  
-	    ret                
+	    ret
+
+findFreeChicken::
+    ld hl, Array_chickens
+    ld b, N_CHICKEN_ARRAY
+    ld de, B_CHICKEN 
+
+	.loop:
+	    ld a, [hl]                  ; Estado
+	    and a                       ; Si el estado es 0, hemos encontrado hueco
+	    ret z                       
+
+	    add hl, de                
+	    dec b                       
+	    jr nz, .loop
+	    or 1
+	    ret
+
+; Recibe:
+;   - A : ID del tipo de pollo (0, 1, 2...)
+
+spawnChicken::
+	;BUSCAR HUECO
+	call findFreeChicken
+	jr z, .save_chicken
+	ret
+	.save_chicken:
+	    ld [hl], 1          ; Estado = 1
+	    inc hl              ; HL - Vida
+
+
+	    push hl             ; Guardamos la posición actual de WRAM en la pila
+	    
+	    ld e, a
+	    ld d, 0             ; DE = ID del pollo
+	    
+	    ; Multiplicamos  * 2 (desplazamos bit a la izquierda)
+	    sla e
+	    rl d                ; DE = ID * 2
+
+	    ld hl, chickenPresetsTable
+	    add hl, de          ; HL - Direccion de la tabla de tipos
+
+	    ld a, [hl+]         ; Vida
+	    ld b, a             ; B = Vida
+	    ld c, [hl]          ; C = Daño
+
+	    pop hl              ; Recuperamos la dirección de WRAM en HL
+
+	    ld a, b
+	    ld [hl+], a         ; Escribir Vida en WRAM
+	    ld a, c
+	    ld [hl+], a         ; Escribir Daño en WRAM
+
+	    ;Posicion
+	    ret
