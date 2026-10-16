@@ -90,5 +90,13 @@ spawnChicken::
 	    ld a, c
 	    ld [hl+], a         ; Escribir Daño en WRAM
 
-	    ;Posicion
+	    ;Posicion, depende de como definamos al logica de los niveles
 	    ret
+;Movemos una chicken de memoria (la chicken no tiene porque estar activa)
+;Recibe hl, primer byte del chicken en array de chickens, (hl - estado de x chicken)
+moveLeftChicken::
+	; Necesitamos saber si podemos mover la chicken a la izquierda
+		; - Limite de mapa¿
+		; - Colision?
+;;Mueve todas las chicken que estan en pantalla ahora mismo.
+moveAllActiveChicken::
