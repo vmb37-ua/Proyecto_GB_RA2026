@@ -22,7 +22,7 @@ SECTION "Data", WRAM0
 
 ;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
 Array_pollos:: ds 160
-;; El doble :: hace que se linkee para otros archivos
+
 ;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
 Array_strong:: ds 160
 
