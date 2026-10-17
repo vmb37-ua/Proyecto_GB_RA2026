@@ -21,6 +21,13 @@ Casilla_placeholder::
     db $01, $01, $01, $01, $01, $01, $01, $01, $03, $03, $03, $03, $07, $07, $FF, $FF ; tile 4 (inf-der)
 .fin::
 
+Tile_camino::
+    db $55, $FF, $99, $F7, $55, $AA, $FF, $00, $FF, $00, $FF, $00, $FF, $00, $66, $00 ; tile 5
+.fin::
+
+Tile_camino_inv::
+    db $66, $00, $FF, $00, $FF, $00, $FF, $00, $FF, $00, $55, $AA, $99, $F7, $55, $FF ; tile 6
+.fin::
 
 SECTION "Render", ROM0
 
