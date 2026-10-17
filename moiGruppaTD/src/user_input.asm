@@ -36,9 +36,7 @@ wPadB::         ds 1
 SECTION "CursorLogic", ROM0
 
 user_input::
-    ; Ya no leemos $FF00 aquí. Confiamos en que las variables wPadX 
-    ; ya traen la información de este fotograma gracias al motor principal.
-
+    ; Quite lo de leer desde aqui
     ; --- MÁQUINA DE ESTADOS ---
     ld   a, [wCursorState]
     or   a
