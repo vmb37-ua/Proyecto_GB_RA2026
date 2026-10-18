@@ -24,7 +24,7 @@ SECTION "Data", WRAM0
 Array_chickens:: ds 160
 
 ;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
-Array_strong: ds 160
+Array_strong:: ds 160
 
 SECTION "Entry point", ROM0[$150]
 
