@@ -50,7 +50,7 @@ $(TARGET): $(OBJ_FILES)
 define GenerateAssemblyRule
 $(eval __OBJECT:=$(strip $(1)))
 $(eval __SOURCE:=$(call Swap,$(OBJ),$(OBJ_EXT),$(SRC),$(SRC_EXT),$(__OBJECT)))
-$(__OBJECT): $(__SOURCE)
+$(__OBJECT): $(__SOURCE) $(wildcard $(SRC)/*.inc $(SRC)/*/*.inc $(SRC)/*/*/*.inc)
 	@echo "## ASSEMBLING: '$(__SOURCE)' -> '$(__OBJECT)'"
 	$(MKDIR) -p ./$(dir $(__OBJECT))
 	$(RGBASM) $(__SOURCE) -p $(PAD) $(ASMFLAGS) $(INCLUDE) $(GBT_INCLUDE) -o $(__OBJECT)

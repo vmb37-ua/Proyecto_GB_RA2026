@@ -23,7 +23,7 @@
 SECTION "Header", ROM0[$100]
    ;;--------------------------------------
    ;;-- Entry Point ($0100-$0103. 4 bytes)
-   nop     ;; [1 byte ] Do nothing, just take 1 byte of space to complete de 4 bytes
+   di      ;; Entry: interrupts remain disabled (frame polling, HRAM DMA)
    ; di    ;; [1 byte ] Can also disable/enable interrupts instead (1 byte)
    jp main ;; [3 bytes] Jump to main (3 bytes)
 
@@ -50,7 +50,7 @@ SECTION "Header", ROM0[$100]
    ;;    If title is less than 11 bytes, 00's should be added as padding.
    ;;    Older cartridges used 16 bytes, and no manufacturer code was present
    ;;  0123456789A (Max 11 bytes, from 0 to A in Hex)
-   db "Your Game"       ;; String constants do not end in 0
+   db "MOIGRUPPATD"     ;; String constants do not end in 0
    ds $013F - @, 0      ;; Pad Title with 0's up to $013E
 
    ;;--------------------------------------
@@ -81,7 +81,7 @@ SECTION "Header", ROM0[$100]
    ;;--------------------------------------
    ;;-- Cartridge Type ($0147, 1 byte)
    ;;    See https://gbdev.io/pandocs/The_Cartridge_Header.html#0147--cartridge-type for cartridge types
-   db $03   ;; MBC1 + RAM + BATTERY, to use 32KB + 8KB external RAM + Battery for save games
+   db $00   ;; ROM ONLY: no mapper, external RAM or save system
 
    ;;--------------------------------------
    ;;-- ROM Size ($0148, 1 byte)
@@ -91,7 +91,7 @@ SECTION "Header", ROM0[$100]
    ;;--------------------------------------
    ;;-- RAM Size ($0149, 1 byte)
    ;;    See https://gbdev.io/pandocs/The_Cartridge_Header.html#0149--ram-size
-   db $02   ;; 8 KiB (1 external Bank RAM)
+   db $00   ;; No external RAM
 
    ;;--------------------------------------
    ;;-- Destination Code ($014A, 1 byte)
