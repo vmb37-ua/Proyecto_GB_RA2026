@@ -21,10 +21,10 @@ DEF TAM_ARRAY_STRONG = 120
 SECTION "Data", WRAM0
 
 ;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
-Array_chickens:: ds 160
+Array_pollos:: ds 160
 
 ;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
-Array_strong: ds 160
+Array_strong:: ds 160
 
 SECTION "Entry point", ROM0[$150]
 
@@ -38,6 +38,7 @@ main::
    game_mainloop:
       call render ;; Renderización
       call check_end ;; Ha acabado la partida? -> Llama a game_end
+      call init_player ;; Para inicializar todos los valores del player
       call user_input ;; Actualizar el input del usuario en el modelo
       call simulation ;; Procedimiento del juego
    jr game_mainloop
