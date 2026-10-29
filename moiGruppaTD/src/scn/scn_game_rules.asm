@@ -234,6 +234,36 @@ game_entidad_en::
 ;; Parametros entrada: -
 ;; Parametros salida: NC, comprado. C, no se ha comprado
 game_comprar_strong::
-    ;; ◉◉TU CÓDIGO: copia aqui el codigo del enunciado y corrigelo◉◉
-    scf                         ;; (provisional: nunca se compra)
-    ret
+    ld a, [wSelectedRow]        ;; \ B = posicion = %ffffcccc
+    add FILA_CARRIL0            ;; | (se suma la fila del carril
+    swap a                      ;; |  antes de pasarla al nibble alto)
+    ld b, a                     ;; |
+    ld a, [wSelectedCol]        ;; |
+    or b                        ;; |
+    ld b, a                     ;; /
+
+    call game_entidad_en        ;; \ Ocupada?
+    jr z, .no                   ;; / Si: no se compra
+
+    ld d, b                     ;; \ C = coste del tipo
+    ld a, [wMenuSlot]           ;; | (game_strong_coste modifica BC:
+    call game_strong_coste      ;; |  guardamos la posicion en D)
+    ld c, a                     ;; |
+    ld b, d                     ;; /
+
+    ld a, [wProtein]            ;; \ Hay saldo?
+    cp c                        ;; |
+    ret c                       ;; / No: C
+
+    push bc                     ;; \ Colocamos el strongman
+    ld a, [wMenuSlot]           ;; | (game_strong_colocar modifica BC:
+    call game_strong_colocar    ;; |  guardamos el coste en la pila)
+    pop bc                      ;; |
+    jr nz, .no                  ;; / No hay hueco en el array
+
+    ld b, c                     ;; \ Pagamos: NC
+    jp moneda_restar            ;; /
+
+    .no:
+        scf                     ;; No se ha comprado: C
+        ret

@@ -86,5 +86,11 @@ hud_dibujar_moneda::
 ;; Parametros entrada: -
 ;; Parametros salida: -
 hud_update::
-    ;; ◉◉TU CÓDIGO◉◉
-    ret
+    call hud_dibujar_moneda     ;; Saldo de proteina
+
+    ld a, [wMenuSlot]           ;; \ A = coste del tipo del hueco
+    call game_strong_coste      ;; /
+
+    ld b, HUD_COSTE_COL         ;; \ Lo dibujamos en su sitio
+    ld c, HUD_COSTE_FILA        ;; | (hud_dibujar_numero hace el ret)
+    jp hud_dibujar_numero       ;; /
