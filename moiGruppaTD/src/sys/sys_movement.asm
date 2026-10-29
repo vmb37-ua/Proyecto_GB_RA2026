@@ -3,28 +3,29 @@
 ;; Mueve los pollos hacia la izquierda por su carril
 ;;==============================================================
 INCLUDE "man/man_entity.inc"
+INCLUDE "scn/scn_game.inc"
 
 SECTION "System: movement", ROM0
 
-;; Mueve UNA entidad a la izquierda (la entidad no tiene por que estar activa)
-;; Solo trabaja con entidades con el componente MOVE
-;; Usa: a
+;;--------------------------------------------------------------
+;; EJERCICIO 8 (a)
+;;--------------------------------------------------------------
+;; Mueve UNA entidad con MOVE una casilla a la izquierda:
+;; - Si esta en la columna 0: ha llegado a la casa -> wGameState = GAME_PERDIDO
+;; - Si la casilla de su izquierda esta ocupada, no se mueve (sys_combat se encarga)
+;; - Si no: POS - 1 y marca ESTADO_MOVIDO (sys_render borrara la casilla vieja)
+;; Usa: a, bc, de, hl
 ;; Parametros entrada: de-entidad
 ;; Parametros salida: -
 sys_movement_one::
-    ld a, [de]                  ;; \ Tiene MOVE?
-    and CMP_MOVE                ;; |
-    ret z                       ;; / No: no es para este sistema
-
-    ;; Necesitamos saber si podemos mover la chicken a la izquierda
-        ;; - Limite de mapa¿
-        ;; - Colision?
+    ;; ◉◉TU CÓDIGO◉◉
     ret
 
-;; Mueve todas las entidades con MOVE que estan en pantalla ahora mismo
+;; EJERCICIO 8 (b): mueve todas las entidades con MOVE, pero solo 1 de cada 64 frames
+;; (cuando frame_counter AND MOVE_MASK = 0)
 ;; Usa: a, bc, de, hl
 ;; Parametros entrada: -
 ;; Parametros salida: -
 sys_movement_update::
-    ld hl, sys_movement_one
-    jp man_entity_for_each
+    ;; ◉◉TU CÓDIGO◉◉
+    ret

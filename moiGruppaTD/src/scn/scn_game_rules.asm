@@ -8,8 +8,14 @@ INCLUDE "scn/scn_game.inc"
 
 SECTION "Game rules", ROM0
 
-VidaStrongmen: db 10, 20, 30, 40, 50, 60
-DanoStrongmen: db 1, 2, 3, 4, 5, 6
+VidaStrongmen:  db 10, 20, 30, 40, 50, 60
+DanoStrongmen:  db 1, 2, 3, 4, 5, 6
+CosteStrongmen: db 2, 3, 4, 5, 6, 7
+
+SECTION "Game state", WRAM0
+wGameState:: ds 1               ;; GAME_JUGANDO, GAME_PERDIDO o GAME_GANADO
+
+SECTION "Game rules (2)", ROM0
 
 ;; Devuelve en a la vida del tipo a
 ;; Usa: a, bc, hl
@@ -79,32 +85,6 @@ game_strong_colocar::
     xor a                       ;; Z: colocado
     ret
 
-;; Paga y coloca un strongman en la casilla elegida con el cursor
-;; Tipo = wMenuSlot, casilla = (wSelectedRow, wSelectedCol)
-;; Usa: a, bc, de, hl
-;; Parametros entrada: -
-;; Parametros salida: NC, comprado. C, no hay saldo o no hay entidades libres
-game_comprar_strong::
-    ld a, [wProtein]            ;; \ Hay saldo suficiente?
-    cp COSTE_STRONG             ;; | (se mira antes de colocar: si no hay
-    ret c                       ;; / hueco no se cobra)
-
-    ld a, [wSelectedRow]        ;; \ B = posicion = %ffffcccc
-    swap a                      ;; |
-    ld b, a                     ;; |
-    ld a, [wSelectedCol]        ;; |
-    or b                        ;; |
-    ld b, a                     ;; /
-    ld a, [wMenuSlot]           ;; A = tipo
-    call game_strong_colocar
-    jr z, .pagar
-    scf                         ;; No hay hueco: C
-    ret
-
-    .pagar:
-        ld b, COSTE_STRONG
-        jp moneda_restar        ;; Hay saldo: NC
-
 ;; Tabla con los datos estaticos de los pollos: [Vida, Daño]
 chickenPresetsTable:
     db 10, 1  ;tipo a
@@ -154,10 +134,106 @@ game_chicken_spawn::
     xor a                       ;; Z: creado
     ret
 
-;; Ha acabado la partida?
+;;--------------------------------------------------------------
+;; CODIGO COMUN
+;;--------------------------------------------------------------
+
+;; Empieza la partida
 ;; Usa: a
+game_estado_init::
+    ld a, GAME_JUGANDO
+    ld [wGameState], a
+    ret
+
+;; Devuelve en a el coste del tipo a
+;; Usa: a, bc, hl
+;; Parametros entrada: a-tipo strongman
+;; Parametros salida: a-coste
+game_strong_coste::
+    ld hl, CosteStrongmen
+    jr game_leer_tabla
+
+;; Mata una entidad: VIDA = 0 y solo le queda RENDER (deja de moverse y de pegar).
+;; sys_render borra su casilla y la libera
+;; Usa: a
+;; Parametros entrada: hl-entidad
+;; Parametros salida: hl-entidad
+game_matar::
+    ld [hl], CMP_ALIVE | CMP_RENDER
+    ld a, l                     ;; \ entity.VIDA = 0
+    add E_VIDA                  ;; |
+    ld l, a                     ;; |
+    ld [hl], 0                  ;; /
+    sub E_VIDA                  ;; \ HL = entidad otra vez
+    ld l, a                     ;; /
+    ret
+
+;;--------------------------------------------------------------
+;; EJERCICIO 5
+;;--------------------------------------------------------------
+;; Busca una entidad VIVA (CMP_ALIVE y VIDA != 0) que este en la casilla b
+;; Usa: a, c, hl. NO modifica b ni de
+;; Parametros entrada: b-posicion
+;; Parametros salida: Z, hl-entidad encontrada
+;; NZ, la casilla esta libre
+game_entidad_en::
+    ld c, 0
+    ld hl, entity_array
+    .loop:
+        ld a, [hl]
+        bit CMP_ALIVE_BIT, a
+        jr z, .pasar
+
+        inc l
+        inc l
+        inc l
+        ld a, [hl]
+        cp 0
+        dec hl
+        dec hl
+        dec hl
+        jr z, .pasar
+
+        inc l
+        inc l
+        inc l
+        inc l
+        inc l
+        ld a, [hl]
+        cp b
+        dec hl
+        dec hl
+        dec hl
+        dec hl
+        dec hl
+        jr z, .encontrado
+
+    .pasar:
+        inc c
+        ld a, l
+        add SIZEOF_ENTITY
+        ld l, a
+        ld a, c
+        cp MAX_ENTITIES
+        jr nz, .loop
+        or 1
+        ret
+    
+    .encontrado:
+        ;; hl ya apunta al byte inicial de la entidad (CMP)
+        xor a
+        ret
+
+;;--------------------------------------------------------------
+;; EJERCICIO 6 (a)
+;;--------------------------------------------------------------
+;; Paga y coloca un strongman en la casilla elegida con el cursor
+;; Tipo = wMenuSlot, casilla = (FILA_CARRIL0 + wSelectedRow, wSelectedCol)
+;; No hace nada si la casilla esta ocupada o no hay saldo suficiente
+;; Usa: a, bc, de, hl
 ;; Parametros entrada: -
-;; Parametros salida: Z, la partida ha acabado. NZ, sigue
-game_check_end::
-    or 1                        ;; De momento no acaba nunca: NZ
+;; Parametros salida: NC, comprado. C, no se ha comprado
+game_comprar_strong::
+    ;; ◉◉TU CÓDIGO: copia aqui el codigo del enunciado y corrigelo◉◉
+    scf                         ;; (provisional: nunca se compra)
     ret

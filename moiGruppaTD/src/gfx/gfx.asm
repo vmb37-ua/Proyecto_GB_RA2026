@@ -22,6 +22,18 @@ Tile_camino_inv:
     db $66, $00, $FF, $00, $FF, $00, $FF, $00, $FF, $00, $55, $AA, $99, $F7, $55, $FF ; tile 6
 .fin:
 
+Tiles_pollo:        ;; ◉◉4 tiles: 7..10 (sup-izq, sup-der, inf-izq, inf-der)◉◉
+.fin:
+
+Tiles_strong:       ;; ◉◉4 tiles: 11..14◉◉
+.fin:
+
+Tile_cursor:        ;; ◉◉1 tile: 15 (esquina sup-izq)◉◉
+.fin:
+
+Tiles_numeros:      ;; ◉◉10 tiles: 16..25 (cifras 0..9)◉◉
+.fin:
+
 SECTION "Engine: graphics", ROM0
 
 ;; Carga los tiles en VRAM y la paleta
@@ -54,6 +66,9 @@ gfx_init::
     ld bc, Tile_camino_inv.fin - Tile_camino_inv
     call memcpy
 
+    ;; ◉◉TU CÓDIGO: carga Tiles_pollo, Tiles_strong, Tile_cursor y Tiles_numeros◉◉
+
     ld a, BGP_CONFIG
     ld [rBGP], a
+    ;; ◉◉TU CÓDIGO: paleta de los sprites◉◉
     ret

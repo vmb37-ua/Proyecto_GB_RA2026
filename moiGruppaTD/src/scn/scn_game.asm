@@ -15,8 +15,12 @@ SECTION "Scene: game", ROM0
 scene_game_init::
     call man_entity_init        ;; \ Sin entidades,
     call sys_render_init        ;; | la pantalla con los carriles,
-    call sys_input_init         ;; | el cursor al principio
-    jp moneda_init              ;; / y la proteina inicial
+    call sys_cursor_init        ;; | el menu y la OAM vacia,
+    call sys_input_init         ;; | el cursor al principio,
+    call moneda_init            ;; | la proteina inicial,
+    call game_estado_init       ;; | la partida empezando
+    ld hl, Oleada1              ;; | y la oleada preparada
+    jp game_oleada_init         ;; /
 
 ;; Actualiza la escena (una vez por ciclo)
 ;; Usa: a, bc, de, hl
@@ -24,6 +28,7 @@ scene_game_init::
 ;; Parametros salida: -
 scene_game_update::
     call sys_input_update       ;; Actualizar el input del usuario en el modelo
+    call game_oleada_update     ;; Salen pollos
     call sys_movement_update    ;; Los pollos avanzan
-    call sys_simulation_update  ;; Procedimiento del juego
+    call sys_combat_update      ;; Pollos y strongmen se pegan
     jp sys_render_update        ;; Renderizacion (espera a VBLANK)

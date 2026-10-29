@@ -23,7 +23,9 @@ SECTION "Entry point", ROM0[$150]
 ;; Usa: a, bc, de, hl
 init_console::
    call screen_off         ;; \ Con el LCD apagado:
-   call gfx_init           ;; | tiles y paleta
+   call input_init         ;; | joypad,
+   call frame_init         ;; | contador de frames,
+   call gfx_init           ;; | tiles y paletas
    call scene_game_init    ;; / y la escena del juego
    jp screen_on
 
@@ -32,12 +34,14 @@ main::
 
    ;; Por cada ciclo
    game_mainloop:
-      call input_update
+      call input_update      ;; Lee el joypad -> wPad*
+      call frame_tick        ;; Un frame mas
       call scene_game_update ;; Input, simulación y renderización
       call game_check_end    ;; Ha acabado la partida? (Z) -> game_end
    jr nz, game_mainloop
 
    game_end:
+   call game_pantalla_final ;; Has ganado o has perdido
 
    di     ;; Disable Interrupts
    halt   ;; Halt the CPU (stop procesing here)

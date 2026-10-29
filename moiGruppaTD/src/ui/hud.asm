@@ -7,6 +7,9 @@ INCLUDE "gfx/gfx.inc"
 ;; Posicion del contador de moneda (en tiles; ocupa 2 de ancho). POR DETERMINAR
 DEF HUD_MONEDA_COL  = 18
 DEF HUD_MONEDA_FILA = 17
+;; Posicion del coste del strongman del hueco wMenuSlot (2 de ancho)
+DEF HUD_COSTE_COL   = 0
+DEF HUD_COSTE_FILA  = 17
 
 SECTION "HUD", ROM0
 
@@ -72,3 +75,16 @@ hud_dibujar_moneda::
     ld b, HUD_MONEDA_COL
     ld c, HUD_MONEDA_FILA
     jp hud_dibujar_numero
+
+;;--------------------------------------------------------------
+;; EJERCICIO 6 (b)
+;;--------------------------------------------------------------
+;; Dibuja el HUD: el saldo (wProtein) en (HUD_MONEDA_COL, HUD_MONEDA_FILA)
+;; y el coste del strongman del hueco wMenuSlot en (HUD_COSTE_COL, HUD_COSTE_FILA)
+;; Requiere estar en VBLANK
+;; Usa: a, bc, de, hl
+;; Parametros entrada: -
+;; Parametros salida: -
+hud_update::
+    ;; ◉◉TU CÓDIGO◉◉
+    ret

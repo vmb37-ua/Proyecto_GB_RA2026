@@ -66,61 +66,93 @@ sys_render_init::
             jr nz, .borrar_tile
         ret
 
-;; Dibuja UNA entidad: su casilla 2x2 en E_POS
-;; Solo trabaja con entidades con el componente RENDER
-;; Requiere LCD apagado o estar en VBLANK
-;; Usa: a, bc, de, hl
-;; Parametros entrada: de-entidad
-;; Parametros salida: -
-sys_render_one::
-    ld a, [de]                  ;; \ Tiene RENDER?
-    and CMP_RENDER              ;; |
-    ret z                       ;; / No: no es para este sistema
+;;--------------------------------------------------------------
+;; CODIGO COMUN
+;;--------------------------------------------------------------
 
-    ld hl, E_POS                ;; \ A = entity.POS = %ffffcccc
-    add hl, de                  ;; |
-    ld a, [hl]                  ;; /
+;; Primer tile de cada KIND (indice: E_KIND)
+TilesKind:
+    db TILE_VACIO               ;; 0 (no se usa)
+    db TILE_POLLO               ;; KIND_CHICKEN
+    db TILE_STRONG              ;; KIND_STRONG
 
+;; Direccion del tilemap de la esquina sup-izq de una casilla
+;; Usa: a, bc, hl
+;; Parametros entrada: a-posicion %ffffcccc
+;; Parametros salida: hl-direccion = BG_MAP + fila * 64 + columna * 2
+sys_render_pos_dir::
     ld b, a                     ;; \ C = columna * 2 (tiles)
     and $0F                     ;; |
     add a                       ;; |
     ld c, a                     ;; /
-
     ld a, b                     ;; \ HL = fila * 16
     and $F0                     ;; |
     ld l, a                     ;; |
     ld h, 0                     ;; /
     add hl, hl                  ;; \ HL = fila * 64 = fila * 2 * TILEMAP_ANCHO
     add hl, hl                  ;; /
-
     ld b, 0                     ;; \ HL += columna * 2
     add hl, bc                  ;; /
-    ld bc, BG_MAP               ;; \ HL = dir del tilemap de la esquina sup-izq
+    ld bc, BG_MAP               ;; \ HL += inicio del tilemap
     add hl, bc                  ;; /
-    ;; jp .dibujar_casilla      ;; (justo debajo)
+    ret
 
-    .dibujar_casilla:
-        ;; Dibuja una casilla 2x2 (tiles TILE_CASILLA..TILE_CASILLA+3)
-        ;; Usa: a, de, hl
-        ;; Parametros entrada: hl-dir del tilemap de la esquina superior izquierda
-        ;; Parametros salida: -
-        ld a, TILE_CASILLA
-        ld [hl+], a                 ; (x,   y)   sup-izq
-        inc a
-        ld [hl], a                  ; (x+1, y)   sup-der
-        ld de, TILEMAP_ANCHO - 1
-        add hl, de                  ; baja una fila y vuelve a la columna x
-        inc a
-        ld [hl+], a                 ; (x,   y+1) inf-izq
-        inc a
-        ld [hl], a                  ; (x+1, y+1) inf-der
-        ret
+;; Dibuja una casilla 2x2 con 4 tiles consecutivos (sup-izq, sup-der, inf-izq, inf-der)
+;; Requiere LCD apagado o estar en VBLANK
+;; Usa: a, bc, hl
+;; Parametros entrada: hl-dir de la esquina sup-izq, a-primer tile
+;; Parametros salida: -
+sys_render_casilla::
+    ld [hl+], a                 ;; (x,   y)   sup-izq
+    inc a
+    ld [hl], a                  ;; (x+1, y)   sup-der
+    ld bc, TILEMAP_ANCHO - 1
+    add hl, bc                  ;; baja una fila y vuelve a la columna x
+    inc a
+    ld [hl+], a                 ;; (x,   y+1) inf-izq
+    inc a
+    ld [hl], a                  ;; (x+1, y+1) inf-der
+    ret
 
-;; Espera a VBLANK y dibuja TODAS las entidades con RENDER
+;; Dibuja el fondo de una casilla de carril (borra lo que hubiera)
+;; Requiere LCD apagado o estar en VBLANK
+;; Usa: a, bc, hl
+;; Parametros entrada: hl-dir de la esquina sup-izq
+;; Parametros salida: -
+sys_render_fondo::
+    ld a, TILE_CAMINO
+    ld [hl+], a
+    ld [hl], a
+    ld bc, TILEMAP_ANCHO - 1
+    add hl, bc
+    ld a, TILE_CAMINO_INV
+    ld [hl+], a
+    ld [hl], a
+    ret
+
+;; Espera a VBLANK y dibuja: cursor, HUD y TODAS las entidades con RENDER
 ;; Usa: a, bc, de, hl
 ;; Parametros entrada: -
 ;; Parametros salida: -
 sys_render_update::
     call wait_vblank
+    call sys_cursor_update      ;; Ej. 4 (OAM: solo en VBLANK)
+    call hud_update             ;; Ej. 6b
     ld hl, sys_render_one
     jp man_entity_for_each
+
+;;--------------------------------------------------------------
+;; EJERCICIO 2
+;;--------------------------------------------------------------
+;; Dibuja UNA entidad con RENDER:
+;; 1. Si esta muerta (VIDA = 0): dibuja el fondo en su casilla y la libera.
+;; 2. Si se ha movido (ESTADO_MOVIDO): quita la marca y dibuja el fondo en la
+;;    casilla de su derecha (de donde viene).
+;; 3. Dibuja su casilla con el primer tile de su KIND (tabla TilesKind).
+;; Requiere estar en VBLANK
+;; Usa: a, bc, de, hl
+;; Parametros entrada: de-entidad
+;; Parametros salida: -
+sys_render_one::
+    ;; ◉◉TU CÓDIGO◉◉
+    ret
