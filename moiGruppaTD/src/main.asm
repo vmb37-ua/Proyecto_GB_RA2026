@@ -32,6 +32,7 @@ main::
 
    ;; Por cada ciclo
    game_mainloop:
+      call input_update
       call scene_game_update ;; Input, simulación y renderización
       call game_check_end    ;; Ha acabado la partida? (Z) -> game_end
    jr nz, game_mainloop

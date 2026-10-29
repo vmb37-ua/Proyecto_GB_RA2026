@@ -7,7 +7,7 @@ INCLUDE "scn/scn_game.inc"
 
 SECTION "Scene: game", ROM0
 
-;; Inicializa la escena: sin entidades, carriles, cursor, proteina y strongmen de ejemplo
+;; Inicializa la escena: sin entidades, carriles, cursor y proteina
 ;; Requiere LCD apagado
 ;; Usa: a, bc, de, hl
 ;; Parametros entrada: -
@@ -16,15 +16,7 @@ scene_game_init::
     call man_entity_init        ;; \ Sin entidades,
     call sys_render_init        ;; | la pantalla con los carriles,
     call sys_input_init         ;; | el cursor al principio
-    call moneda_init            ;; / y la proteina inicial
-
-    ;; Ejemplo: dos strongmen
-    ld a, 0                     ;; \ Tipo 0 en la casilla fila 1, columna 2
-    ld b, (1 << 4) | 2          ;; | (tiles: columna 4, fila 2)
-    call game_strong_colocar    ;; /
-    ld a, 1                     ;; \ Tipo 1 en la casilla fila 3, columna 5
-    ld b, (3 << 4) | 5          ;; | (tiles: columna 10, fila 6)
-    jp game_strong_colocar      ;; /
+    jp moneda_init              ;; / y la proteina inicial
 
 ;; Actualiza la escena (una vez por ciclo)
 ;; Usa: a, bc, de, hl
