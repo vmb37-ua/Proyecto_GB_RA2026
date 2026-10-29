@@ -14,6 +14,14 @@ Casilla_placeholder:
     db $01, $01, $01, $01, $01, $01, $01, $01, $03, $03, $03, $03, $07, $07, $FF, $FF ; tile 4 (inf-der)
 .fin:
 
+Tile_camino:
+    db $55, $FF, $99, $F7, $55, $AA, $FF, $00, $FF, $00, $FF, $00, $FF, $00, $66, $00 ; tile 5
+.fin:
+
+Tile_camino_inv:
+    db $66, $00, $FF, $00, $FF, $00, $FF, $00, $FF, $00, $55, $AA, $99, $F7, $55, $FF ; tile 6
+.fin:
+
 SECTION "Engine: graphics", ROM0
 
 ;; Carga los tiles en VRAM y la paleta
@@ -32,6 +40,18 @@ gfx_init::
     ld hl, Casilla_placeholder
     ld de, VRAM_TILES + TILE_CASILLA * TILE_TAM
     ld bc, Casilla_placeholder.fin - Casilla_placeholder
+    call memcpy
+
+    ;; Define camino tile 5
+    ld hl, Tile_camino
+    ld de, VRAM_TILES + TILE_CAMINO * TILE_TAM
+    ld bc, Tile_camino.fin - Tile_camino
+    call memcpy
+
+    ;; Define camino_inv tile 6
+    ld hl, Tile_camino_inv
+    ld de, VRAM_TILES + TILE_CAMINO_INV * TILE_TAM
+    ld bc, Tile_camino_inv.fin - Tile_camino_inv
     call memcpy
 
     ld a, BGP_CONFIG

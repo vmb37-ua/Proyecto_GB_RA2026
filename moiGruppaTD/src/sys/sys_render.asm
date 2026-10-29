@@ -5,12 +5,13 @@
 INCLUDE "engine/hardware.inc"
 INCLUDE "gfx/gfx.inc"
 INCLUDE "man/man_entity.inc"
+INCLUDE "scn/scn_game.inc"
 
 SECTION "System: render", ROM0
 
-;; Borra toda la pantalla en la vista
+;; Borra toda la pantalla en la vista y dibuja el fondo (los carriles)
 ;; Requiere LCD apagado
-;; Usa: a, b, de, hl
+;; Usa: a, bc, de, hl
 ;; Parametros entrada: -
 ;; Parametros salida: -
 sys_render_init::
@@ -22,7 +23,34 @@ sys_render_init::
         add hl, de
         dec b
         jr nz, .loop
-    ret
+
+    ld e, N_CARRILES
+    ;; jr .dibujar_carriles     ;; (justo debajo)
+
+    .dibujar_carriles:
+        ;; Dibuja carriles de 2 filas: borde de arriba (TILE_CAMINO)
+        ;; y borde de abajo (TILE_CAMINO_INV), empezando en FILA_CAMINO
+        ;; Usa: a, bc, d, e, hl
+        ;; Parametros entrada: e-numero de carriles (>0)
+        ;; Parametros salida: -
+        ld hl, BG_MAP + FILA_CAMINO * TILEMAP_ANCHO
+        .carril:
+            ;; Fila de arriba
+            ld bc, CAMINO_ANCHO
+            ld d, TILE_CAMINO
+            call memset
+            ld bc, TILEMAP_ANCHO - CAMINO_ANCHO
+            add hl, bc
+
+            ;; Fila de abajo
+            ld bc, CAMINO_ANCHO
+            ld d, TILE_CAMINO_INV
+            call memset
+            ld bc, TILEMAP_ANCHO - CAMINO_ANCHO
+            add hl, bc
+            dec e
+            jr nz, .carril
+        ret
 
     .borrar_fila_vista:
         ;; Borra la fila seleccionada (dentro de la vista)

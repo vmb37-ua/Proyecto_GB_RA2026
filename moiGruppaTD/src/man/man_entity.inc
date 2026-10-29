@@ -26,9 +26,11 @@ ASSERT ENTITY_ARRAY_SIZE <= 256
 
 ;; Bits de CMP. CMP = 0 → la entidad esta LIBRE
 DEF CMP_RENDER_BIT = 0
+DEF CMP_MOVE_BIT   = 1
 DEF CMP_ALIVE_BIT  = 7
 ;; Mascaras de CMP
 DEF CMP_RENDER     = 1 << CMP_RENDER_BIT    ;; Se dibuja en su casilla (E_POS)
+DEF CMP_MOVE       = 1 << CMP_MOVE_BIT      ;; Avanza por el carril (los pollos)
 DEF CMP_ALIVE      = 1 << CMP_ALIVE_BIT
 
 ;; KIND

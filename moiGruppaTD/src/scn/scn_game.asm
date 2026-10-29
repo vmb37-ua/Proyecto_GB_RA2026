@@ -7,14 +7,16 @@ INCLUDE "scn/scn_game.inc"
 
 SECTION "Scene: game", ROM0
 
-;; Inicializa la escena: sin entidades, pantalla vacia y strongmen de ejemplo
+;; Inicializa la escena: sin entidades, carriles, cursor, proteina y strongmen de ejemplo
 ;; Requiere LCD apagado
 ;; Usa: a, bc, de, hl
 ;; Parametros entrada: -
 ;; Parametros salida: -
 scene_game_init::
-    call man_entity_init        ;; \ Sin entidades
-    call sys_render_init        ;; / y la pantalla vacia
+    call man_entity_init        ;; \ Sin entidades,
+    call sys_render_init        ;; | la pantalla con los carriles,
+    call sys_input_init         ;; | el cursor al principio
+    call moneda_init            ;; / y la proteina inicial
 
     ;; Ejemplo: dos strongmen
     ld a, 0                     ;; \ Tipo 0 en la casilla fila 1, columna 2
@@ -30,5 +32,6 @@ scene_game_init::
 ;; Parametros salida: -
 scene_game_update::
     call sys_input_update       ;; Actualizar el input del usuario en el modelo
+    call sys_movement_update    ;; Los pollos avanzan
     call sys_simulation_update  ;; Procedimiento del juego
     jp sys_render_update        ;; Renderizacion (espera a VBLANK)
