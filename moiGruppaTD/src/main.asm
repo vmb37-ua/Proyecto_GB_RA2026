@@ -15,32 +15,26 @@
 ;; ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                         ;;
 ;;-------------------------------------------------------------------------------------------------------------------------------;;
 
-DEF TAM_ARRAY_POLLOS = 120
-DEF TAM_ARRAY_STRONG = 120
-
-SECTION "Data", WRAM0
-
-;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
-Array_chickens:: ds 160
-
-;; 1 estado ($00 no existe, resto animación), 1 vida, 1 daño, 1 posicion
-Array_strong:: ds 160
+;; Las entidades (pollos y strongmen) estan en man/man_entity.asm
 
 SECTION "Entry point", ROM0[$150]
 
+;; Inicializa la consola: graficos con el LCD apagado y la escena del juego
+;; Usa: a, bc, de, hl
+init_console::
+   call screen_off         ;; \ Con el LCD apagado:
+   call gfx_init           ;; | tiles y paleta
+   call scene_game_init    ;; / y la escena del juego
+   jp screen_on
+
 main::
+   call init_console ;; Inicialización del programa
 
-   
-
-   call init ;; Inicialización del programa
-   
    ;; Por cada ciclo
    game_mainloop:
-      call render ;; Renderización
-      call check_end ;; Ha acabado la partida? -> Llama a game_end
-      call user_input ;; Actualizar el input del usuario en el modelo
-      call simulation ;; Procedimiento del juego
-   jr game_mainloop
+      call scene_game_update ;; Input, simulación y renderización
+      call game_check_end    ;; Ha acabado la partida? (Z) -> game_end
+   jr nz, game_mainloop
 
    game_end:
 
