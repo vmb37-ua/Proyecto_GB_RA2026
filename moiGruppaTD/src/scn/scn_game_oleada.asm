@@ -66,5 +66,64 @@ game_oleada_init::
 ;; Parametros entrada: -
 ;; Parametros salida: -
 game_oleada_update::
-    ;; ◉◉TU CÓDIGO◉◉
+    ld a, [woleadaFin]
+    or a
+    ret nz                  ; Si woleadaFin es 1 (se acabo la oleada), no hacemos nada
+
+    ld hl, woleadaEspera
+    dec [hl]
+    ret nz                  ; Si el contador de espera del pollo actual no es 0, decrementamos y salimos
+
+    ;; Cargamos el puntero woleadaPtr (Siempre apunta al tipo de pollo en la oleada)
+    ld a, [woleadaPtr]
+    ld e, a
+    ld a, [woleadaPtr + 1]
+    ld d, a
+
+    inc de                  ; DE ahora es fila
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; SE PUEDE OPTIMIZAR SOLO GUARDANDO LA NORMALIZACION                                       ;;
+    ;; NO SE HACE POR SI MODIFICAMOS FILA_CARRIL0 (PRIMER CARRIL) NO TENGAMOS QUE MODIFICAR TODO;;
+    ;; Cuando no tengamos que modificar nada mas lo podemos optimizar                           ;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ld a, [de]
+    add FILA_CARRIL0 ;; Normalizamos a fila del tablero (x + 5)
+    swap a ;; Pasamos a bit alto  - (x/fila) - (fila/x)
+    or COL_ENTRADA ;; Le ponemos el bit bajo de la columna - (fila/columna) en a
+    ld b, a
+
+    ;; Comprobamos si la casilla de entrada esta ocupada
+    call game_entidad_en
+    jr z, .bloqueado        ; Si Z, la casilla esta ocupada
+
+    ;; Si la casilla esta libre podemos crear el pollo
+    dec de  ;;DE apunta a tipo             
+    ld a, [de]              
+    push de                 ; Guardarmos DE porque game_chicken_spawn lo modifica
+    call game_chicken_spawn
+    pop de 
+
+    ;; Avanzamos a la siguiente espera:
+    inc de                  ; DE -> carril
+    inc de                  ; DE -> espera de la siguiente entrada
+    ld a, [de]
+    or a
+    jr z, .terminar_oleada
+
+    ld [woleadaEspera], a
+    inc de                  ; DE -> tipo de la siguiente entrada (porque woleadaPTR apunta al tipo)
+    ld a, e
+    ld [woleadaPtr], a
+    ld a, d
+    ld [woleadaPtr + 1], a
+    ret
+
+.bloqueado:
+    ld a, 1
+    ld [woleadaEspera], a   ; Reintentar en el proximo frame
+    ret
+
+.terminar_oleada:
+    ld a, 1
+    ld [woleadaFin], a
     ret
