@@ -70,5 +70,9 @@ sys_movement_one::
 ;; Parametros entrada: -
 ;; Parametros salida: -
 sys_movement_update::
-    ;; ◉◉TU CÓDIGO◉◉
-    ret
+    ld a, [frame_counter]
+        and MOVE_MASK
+        ret nz                  ; Solo se ejecuta si los bits de MOVE_MASK son 0
+
+        ld hl, sys_movement_one
+        jp man_entity_for_each
