@@ -18,7 +18,50 @@ SECTION "System: movement", ROM0
 ;; Parametros entrada: de-entidad
 ;; Parametros salida: -
 sys_movement_one::
-    ;; ◉◉TU CÓDIGO◉◉
+    ;; Verificamos si la entidad se puede mover, tiene CMP_MOVE
+    ld a, [de]              ; A = E_CMP
+    and CMP_MOVE
+    ret z
+
+    ;; Optenemos E_POS (solo tenemos que sumarle al bit bajo)
+    ld a, e
+    add E_POS
+    ld l, a
+    ld h, d
+    ld a, [hl]
+
+    ;; Comprobamos si esta en la columna 0
+    and $0F
+    jr z, .gym
+
+    ;; Calcular casilla de la izquierda (POS - 1, porque es (fila/columna))
+    ld a, [hl]
+    dec a
+    ld b, a                 ; B = casilla izquierda
+
+    call game_entidad_en
+    ret z                   ; Si Z, la casilla esta ocupada, por lo que no se mueve
+
+    ;; Si la casilla esta libre
+    ld a, e
+    add E_POS
+    ld l, a
+    ld h, d
+    ld [hl], b              ; E_POS = POS - 1
+
+    ;; Marcar ESTADO_MOVIDO en E_ESTADO
+    ld a, e
+    add E_ESTADO
+    ld l, a
+    ld h, d
+    ;;or %10000000
+    ;;ld [hl], a
+    set ESTADO_MOVIDO_BIT, [hl]
+    ret
+
+.gym:
+    ld a, GAME_PERDIDO
+    ld [wGameState], a
     ret
 
 ;; EJERCICIO 8 (b): mueve todas las entidades con MOVE, pero solo 1 de cada 64 frames
