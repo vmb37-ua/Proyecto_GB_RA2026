@@ -34,16 +34,16 @@ Oleada1::
 ;; Parametros entrada: hl-oleada
 ;; Parametros salida: -
 game_oleada_init::
-    ld a, [hl+]             ; Lee la primera espera y avanza HL al tipo
+    ld a, [hl+]             ; Leemos lo que tarda el pollo en aparecer (espera), si es 0, es que ya no queda oleada o esta vacia
     or a
     jr z, .fin
 
-    ;; La oleada no esta vacia
+    ;; La oleada no esta vacia, por lo que guardamos la espera del PRIMER POLLO
     ld [woleadaEspera], a
     xor a
-    ld [woleadaFin], a
+    ld [woleadaFin], a ;; Ponemos que la oleada no esta vacia
 
-    ;; Guardar el puntero (HL apunta al tipo de la entrada actual)
+    ;; Guardamos el puntero que apunta al primer pollo (el tipo de pollo)
     ld a, l
     ld [woleadaPtr], a
     ld a, h
