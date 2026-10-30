@@ -34,9 +34,25 @@ Oleada1::
 ;; Parametros entrada: hl-oleada
 ;; Parametros salida: -
 game_oleada_init::
-    ;; ◉◉TU CÓDIGO◉◉
-    ld a, 1                     ;; (provisional: oleada vacia)
-    ld [wOleadaFin], a
+    ld a, [hl+]             ; Lee la primera espera y avanza HL al tipo
+    or a
+    jr z, .fin
+
+    ;; La oleada no esta vacia
+    ld [woleadaEspera], a
+    xor a
+    ld [woleadaFin], a
+
+    ;; Guardar el puntero (HL apunta al tipo de la entrada actual)
+    ld a, l
+    ld [woleadaPtr], a
+    ld a, h
+    ld [woleadaPtr + 1], a
+    ret
+
+.fin:
+    ld a, 1
+    ld [woleadaFin], a
     ret
 
 ;;--------------------------------------------------------------
