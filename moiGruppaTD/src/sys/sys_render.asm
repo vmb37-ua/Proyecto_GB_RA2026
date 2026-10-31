@@ -154,5 +154,59 @@ sys_render_update::
 ;; Parametros entrada: de-entidad
 ;; Parametros salida: -
 sys_render_one::
-    ;; ◉◉TU CÓDIGO◉◉
-    ret
+    ld a, [de]
+    and CMP_RENDER
+    ret z
+
+    ld h, d
+    ld a, e
+    add E_VIDA
+    ld l, a
+    ld a, [hl]
+    or a
+    jr z, .muerta
+
+    ld a, e
+    add E_ESTADO
+    ld l, a
+    bit ESTADO_MOVIDO_BIT, [hl]
+    jr z, .dibujar
+    res ESTADO_MOVIDO_BIT, [hl]
+
+    ld a, e
+    add E_POS
+    ld l, a
+    ld a, [hl]
+    inc a
+    call sys_render_pos_dir
+    call sys_render_fondo
+
+    .dibujar:
+        ld h, d
+        ld a, e
+        add E_KIND
+        ld l, a
+        ld c, [hl]
+        ld a, e
+        add E_POS
+        ld l, a
+        ld a, [hl]
+        push bc
+        call sys_render_pos_dir
+        pop bc
+        push hl
+        ld b, 0
+        ld hl, TilesKind
+        add hl, bc
+        ld a, [hl]
+        pop hl
+        jp sys_render_casilla
+
+    .muerta:
+        ld a, e
+        add E_POS
+        ld l, a
+        ld a, [hl]
+        call sys_render_pos_dir
+        call sys_render_fondo
+        jp man_entity_free
