@@ -17,7 +17,24 @@ SECTION "System: cursor", ROM0
 ;; Parametros entrada: -
 ;; Parametros salida: -
 sys_cursor_init::
-    ;; ◉◉TU CÓDIGO◉◉
+    ;; OAM a 0: un sprite con Y = 0 no se ve
+    ld hl, OAM_RAM
+    ld bc, OAM_TAM
+    ld d, 0
+    call memset
+ 
+    ;; E = posicion del hueco actual (%ffffcccc)
+    ld e, FILA_MENU << 4
+    .bucle:
+    ld a, e
+    call sys_render_pos_dir         ;; HL = direccion del tilemap (no toca DE)
+    ld a, TILE_STRONG
+    call sys_render_casilla         ;; dibuja el strongman 2x2 (no toca DE)
+    inc e                           ;; siguiente hueco (columna + 1)
+    ld a, e
+    cp (FILA_MENU << 4) | MENU_SLOTS
+    jr nz, .bucle
+
     ret
 
 ;;--------------------------------------------------------------
@@ -37,5 +54,77 @@ sys_cursor_init::
 ;; Parametros entrada: -
 ;; Parametros salida: -
 sys_cursor_update::
-    ;; ◉◉TU CÓDIGO◉◉
+    ;; B = fila, C = columna (de casilla)
+    ld a, [wCursorState]
+    or a
+    jr nz, .menu
+ 
+    ld a, [wCursorRow]              ;; Tablero
+    add FILA_CARRIL0
+    ld b, a
+    ld a, [wCursorCol]
+    ld c, a
+    jr .coordenadas
+ 
+.menu:
+    ld b, FILA_MENU                 ;; Menu
+    ld a, [wMenuSlot]
+    ld c, a
+ 
+.coordenadas:
+    ld a, b                         ;; B = y = fila * 16 + OAM_Y_OFFSET
+    swap a
+    add OAM_Y_OFFSET
+    ld b, a
+    ld a, c                         ;; C = x = columna * 16 + OAM_X_OFFSET
+    swap a
+    add OAM_X_OFFSET
+    ld c, a
+ 
+    ld hl, OAM_RAM
+ 
+    ;; Sprite 0: sup-izq (y, x)
+    ld a, b
+    ld [hl+], a
+    ld a, c
+    ld [hl+], a
+    ld a, TILE_CURSOR
+    ld [hl+], a
+    xor a
+    ld [hl+], a
+ 
+    ;; Sprite 1: sup-der (y, x+8)
+    ld a, b
+    ld [hl+], a
+    ld a, c
+    add 8
+    ld [hl+], a
+    ld a, TILE_CURSOR
+    ld [hl+], a
+    ld a, ATTR_XFLIP
+    ld [hl+], a
+ 
+    ;; Sprite 2: inf-izq (y+8, x)
+    ld a, b
+    add 8
+    ld [hl+], a
+    ld a, c
+    ld [hl+], a
+    ld a, TILE_CURSOR
+    ld [hl+], a
+    ld a, ATTR_YFLIP
+    ld [hl+], a
+ 
+    ;; Sprite 3: inf-der (y+8, x+8)
+    ld a, b
+    add 8
+    ld [hl+], a
+    ld a, c
+    add 8
+    ld [hl+], a
+    ld a, TILE_CURSOR
+    ld [hl+], a
+    ld a, ATTR_XFLIP | ATTR_YFLIP
+    ld [hl+], a
+
     ret
