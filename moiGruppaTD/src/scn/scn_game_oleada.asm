@@ -39,20 +39,20 @@ game_oleada_init::
     jr z, .fin
 
     ;; La oleada no esta vacia, por lo que guardamos la espera del PRIMER POLLO
-    ld [woleadaEspera], a
+    ld [wOleadaEspera], a
     xor a
-    ld [woleadaFin], a ;; Ponemos que la oleada no esta vacia
+    ld [wOleadaFin], a ;; Ponemos que la oleada no esta vacia
 
     ;; Guardamos el puntero que apunta al primer pollo (el tipo de pollo)
     ld a, l
-    ld [woleadaPtr], a
+    ld [wOleadaPtr], a
     ld a, h
-    ld [woleadaPtr + 1], a
+    ld [wOleadaPtr + 1], a
     ret
 
 .fin:
     ld a, 1
-    ld [woleadaFin], a
+    ld [wOleadaFin], a
     ret
 
 ;;--------------------------------------------------------------
@@ -66,18 +66,18 @@ game_oleada_init::
 ;; Parametros entrada: -
 ;; Parametros salida: -
 game_oleada_update::
-    ld a, [woleadaFin]
+    ld a, [wOleadaFin]
     or a
-    ret nz                  ; Si woleadaFin es 1 (se acabo la oleada), no hacemos nada
+    ret nz                  ; Si wOleadaFin es 1 (se acabo la oleada), no hacemos nada
 
-    ld hl, woleadaEspera
+    ld hl, wOleadaEspera
     dec [hl]
     ret nz                  ; Si el contador de espera del pollo actual no es 0, decrementamos y salimos
 
-    ;; Cargamos el puntero woleadaPtr (Siempre apunta al tipo de pollo en la oleada)
-    ld a, [woleadaPtr]
+    ;; Cargamos el puntero wOleadaPtr (Siempre apunta al tipo de pollo en la oleada)
+    ld a, [wOleadaPtr]
     ld e, a
-    ld a, [woleadaPtr + 1]
+    ld a, [wOleadaPtr + 1]
     ld d, a
 
     inc de                  ; DE ahora es fila
@@ -110,20 +110,20 @@ game_oleada_update::
     or a
     jr z, .terminar_oleada
 
-    ld [woleadaEspera], a
+    ld [wOleadaEspera], a
     inc de                  ; DE -> tipo de la siguiente entrada (porque woleadaPTR apunta al tipo)
     ld a, e
-    ld [woleadaPtr], a
+    ld [wOleadaPtr], a
     ld a, d
-    ld [woleadaPtr + 1], a
+    ld [wOleadaPtr + 1], a
     ret
 
 .bloqueado:
     ld a, 1
-    ld [woleadaEspera], a   ; Reintentar en el proximo frame
+    ld [wOleadaEspera], a   ; Reintentar en el proximo frame
     ret
 
 .terminar_oleada:
     ld a, 1
-    ld [woleadaFin], a
+    ld [wOleadaFin], a
     ret
